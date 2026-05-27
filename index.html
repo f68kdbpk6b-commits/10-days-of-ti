@@ -43,10 +43,10 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #3B0F0F;
-  --blush: #D4707A;
-  --gold: #D4A96E;
-  --brown: #F5E1D0;
+  --bg: #D4A99A;
+  --blush: #E2A0A0;
+  --gold: #C9A96E;
+  --brown: #4A3728;
   --card: #FFFBF5;
   --card-back: #FFF0ED;
   --serif: 'Outfit', sans-serif;
@@ -69,8 +69,8 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-   radial-gradient(ellipse at 15% 10%, rgba(120,20,20,0.4) 0%, transparent 55%),
-   radial-gradient(ellipse at 85% 90%, rgba(80,10,10,0.5) 0%, transparent 55%);
+   radial-gradient(ellipse at 20% 15%, rgba(228,190,178,0.6) 0%, transparent 55%),
+   radial-gradient(ellipse at 80% 85%, rgba(180,140,130,0.5) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
 }
@@ -334,8 +334,8 @@ body::before {
 /* ─── Tooltip ──────────────────────────────────────────── */
 .tooltip {
   position: absolute;
-  background: #F5E1D0;
-  color: #3B0F0F;
+  background: var(--brown);
+  color: var(--bg);
   font-family: var(--body);
   font-size: 0.75rem;
   padding: 0.35rem 0.65rem;
@@ -452,8 +452,8 @@ body::before {
   font-family: var(--serif);
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--bg);
-  background: #F5E1D0;
+  color: var(--card);
+  background: var(--brown);
   border: none;
   border-radius: 8px;
   padding: 0.7rem 1.6rem;
