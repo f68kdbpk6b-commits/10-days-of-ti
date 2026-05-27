@@ -43,22 +43,21 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #FFF8F0;
-  --blush: #E2A0A0;
-  --gold: #C9A96E;
-  --brown: #4A3728;
+  --bg: #3B0F0F;
+  --blush: #D4707A;
+  --gold: #D4A96E;
+  --brown: #F5E1D0;
   --card: #FFFBF5;
-  --card-back: #FFF5EE;
+  --card-back: #FFF0ED;
   --serif: 'Outfit', sans-serif;
   --body: 'Outfit', sans-serif;
 }
-
 html { font-size: 16px; }
 
 body {
   font-family: var(--body);
-  background: var(--bg);
-  color: var(--brown);
+  background: #F5E1D0;
+  color: #3B0F0F;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -70,8 +69,8 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 15% 10%, rgba(226,160,160,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 90%, rgba(201,169,110,0.14) 0%, transparent 55%);
+   radial-gradient(ellipse at 15% 10%, rgba(120,20,20,0.4) 0%, transparent 55%),
+   radial-gradient(ellipse at 85% 90%, rgba(80,10,10,0.5) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
 }
@@ -335,8 +334,8 @@ body::before {
 /* ─── Tooltip ──────────────────────────────────────────── */
 .tooltip {
   position: absolute;
-  background: var(--brown);
-  color: var(--bg);
+  background: #F5E1D0;
+  color: #3B0F0F;
   font-family: var(--body);
   font-size: 0.75rem;
   padding: 0.35rem 0.65rem;
@@ -374,7 +373,154 @@ body::before {
   pointer-events: none;
   z-index: 100;
 }
+/* ─── Landing Page ─────────────────────────────────────── */
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  position: relative;
+  z-index: 1;
+}
 
+.note-container {
+  position: relative;
+  max-width: 360px;
+  width: 100%;
+}
+
+.binder-clip {
+  display: block;
+  margin: 0 auto -18px;
+  position: relative;
+  z-index: 2;
+  width: 60px;
+  height: auto;
+}
+
+.note {
+  background: #FFFBF5;
+  border: 1.5px solid rgba(201,169,110,0.25);
+  border-radius: 2px;
+  padding: 2.5rem 1.75rem 2rem;
+  box-shadow: 0 2px 12px rgba(74,55,40,0.07), 0 1px 3px rgba(74,55,40,0.05);
+  position: relative;
+  text-align: center;
+}
+
+.note::before {
+  content: '';
+  position: absolute;
+  inset: 2rem 1.25rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 1.65rem,
+    rgba(201,169,110,0.12) 1.65rem,
+    rgba(201,169,110,0.12) 1.7rem
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.note-greeting {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--brown);
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.note-body {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--brown);
+  margin-bottom: 1.75rem;
+  position: relative;
+  z-index: 1;
+  white-space: pre-line;
+}
+
+.note-button {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--bg);
+  background: #F5E1D0;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.6rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.02em;
+}
+.note-button:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 14px rgba(74,55,40,0.15);
+}
+.note-button:active {
+  transform: scale(0.97);
+}
+
+.note-signoff {
+  font-family: var(--body);
+  font-weight: 300;
+  font-size: 0.82rem;
+  color: var(--brown);
+  opacity: 0.5;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cards-section {
+  display: none;
+}
+.cards-section.visible {
+  display: block;
+}
+
+.landing.fade-out {
+  animation: fadeOut 0.5s ease forwards;
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-20px); }
+}
+.cards-section.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+  /* ─── Washi Tape ───────────────────────────────────────── */
+.washi-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 120px;
+  height: 28px;
+  background: rgba(212,169,110,0.45);
+  border-left: 2px dashed rgba(212,169,110,0.25);
+  border-right: 2px dashed rgba(212,169,110,0.25);
+  z-index: 3;
+}
+.washi-tape::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px);
+}
 /* ─── Desktop ──────────────────────────────────────────── */
 @media (min-width: 600px) {
   .card-grid {
@@ -401,17 +547,40 @@ body::before {
   </filter>
 </svg>
 
-<!-- Header -->
+<!-- ─── Landing Page ──────────────────────────────────── -->
+<div class="landing" id="landing">
+  <div class="note-container">
+    <div style="position:relative">
+      <div class="washi-tape"></div>
+      <div class="note">
+        <!-- ═══ YOUR LANDING PAGE TEXT HERE ═══ -->
+        <div class="note-greeting">hi big nugget</div>
+        <div class="note-body">it's almost your birthday.
+
+hẹ, mà đây sẽ là lần đầu mình tổ chức sinh nhật của anh cùng nhau woohooo.
+
+Open one each day, okay? No peeking.</div>
+        <button class="note-button" id="enterBtn">YAAAAY →</button>
+        <div class="note-signoff">— from lil nugget</div>
+        <!-- ═══ END LANDING PAGE TEXT ═══ -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Cards Section (hidden until button click) ────── -->
+<div class="cards-section" id="cardsSection">
+
 <header class="header">
   <h1>10 days of you <span class="pulse-emoji">💌</span></h1>
   <p class="subtitle">one tiny little thing, every day, until your birthday</p>
 </header>
 
-<!-- Card Grid (populated by JS) -->
 <div class="card-grid" id="cardGrid"></div>
 
-<!-- Footer -->
 <footer class="footer" id="footer"></footer>
+
+</div>
 
 <!-- Confetti canvas -->
 <canvas id="confetti-canvas"></canvas>
@@ -624,6 +793,17 @@ setTimeout(() => {
     }
   });
 }, 100);
+ // ─── Landing Page → Cards Transition ──────────────────────
+document.getElementById("enterBtn").addEventListener("click", function() {
+  const landing = document.getElementById("landing");
+  const cards = document.getElementById("cardsSection");
+  landing.classList.add("fade-out");
+  setTimeout(() => {
+    landing.style.display = "none";
+    cards.classList.add("visible", "fade-in");
+    window.scrollTo(0, 0);
+  }, 500);
+});
 // ─── Footer ───────────────────────────────────────────────
 document.getElementById("footer").innerHTML = "made with ❤️ for " + RECIPIENT_NAME;
 
