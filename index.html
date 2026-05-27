@@ -1,0 +1,685 @@
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║                     10 DAYS OF YOU 💌                           ║
+║              Birthday Countdown Card Website                    ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  HOW TO CUSTOMIZE:                                               ║
+║                                                                  ║
+║  1. EDIT THE 10 MESSAGES                                         ║
+║     Scroll down to the JavaScript section and find the comment   ║
+║     block that says "YOUR MESSAGES HERE". You'll see an array    ║
+║     called CARD_MESSAGES with 10 entries. Replace each string    ║
+║     with your own message. Card 1 is the intro, cards 2–9 are   ║
+║     your reasons/memories, card 10 is the birthday finale.       ║
+║                                                                  ║
+║  2. CHANGE THE START DATE                                        ║
+║     Find the line:  const START_DATE = "2026-05-27";             ║
+║     Change it to whatever date you want Day 1 to fall on.        ║
+║     All other days will shift automatically.                     ║
+║                                                                  ║
+║  3. CHANGE THE FOOTER NAME                                       ║
+║     Find the line:  const RECIPIENT_NAME = "[name]";             ║
+║     Replace [name] with the person's name.                       ║
+║                                                                  ║
+║  4. HOW TO DEPLOY                                                ║
+║     Option A: Just double-click this file to open in a browser.  ║
+║     Option B: Drag this file onto https://app.netlify.com/drop   ║
+║     Option C: Push to a GitHub repo and enable GitHub Pages.     ║
+║     It's a single file — no build step needed!                   ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Days of You 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #FFF8F0;
+  --blush: #E2A0A0;
+  --gold: #C9A96E;
+  --brown: #4A3728;
+  --card: #FFFBF5;
+  --card-back: #FFF5EE;
+  --serif: 'Outfit', sans-serif;
+  --body: 'Outfit', sans-serif;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--brown);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Background atmosphere ────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(226,160,160,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(201,169,110,0.14) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── SVG noise filter (referenced by cards) ───────────── */
+.noise-filter { position: absolute; width: 0; height: 0; }
+
+/* ─── Header ───────────────────────────────────────────── */
+.header {
+  text-align: center;
+  padding: 2.5rem 1rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.header h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--brown);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.header h1 .pulse-emoji {
+  display: inline-block;
+  animation: heartbeat 1.4s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.2); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  56% { transform: scale(1); }
+}
+
+.header .subtitle {
+  font-family: var(--body);
+  font-style: normal;
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: var(--brown);
+  opacity: 0.6;
+}
+
+/* ─── Card Grid ────────────────────────────────────────── */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 440px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Individual Card Wrapper ──────────────────────────── */
+.card-wrapper {
+  width: calc(33.333% - 0.75rem);
+  aspect-ratio: 3 / 4;
+  perspective: 800px;
+  transform: rotate(var(--rot, 0deg));
+  /* Dealing animation initial state */
+  opacity: 0;
+  animation: dealIn 0.5s ease-out forwards;
+}
+
+@keyframes dealIn {
+  from {
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg)) translateY(40px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg)) translateY(0) scale(1);
+  }
+}
+
+/* ─── Card (3D flip container) ─────────────────────────── */
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Hover / Active for unlocked cards */
+.card-wrapper.unlocked:not(.flipped-state) .card:hover,
+.card-wrapper.unlocked.flipped-state .card:hover {
+  /* handled via JS to preserve rotation */
+}
+.card-wrapper.unlocked {
+  transition: transform 0.2s ease;
+}
+.card-wrapper.unlocked:hover {
+  transform: rotate(var(--rot, 0deg)) scale(1.04);
+  z-index: 5;
+}
+.card-wrapper.unlocked:active {
+  transform: rotate(var(--rot, 0deg)) scale(0.97);
+}
+
+/* Locked style */
+.card-wrapper.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.card-wrapper.locked .card {
+  cursor: not-allowed;
+}
+.card-wrapper.locked .day-label {
+  opacity: 0.7;
+}
+/* Hide back content completely on locked cards */
+.card-wrapper.locked .card-back .message,
+.card-wrapper.locked .card-back .doodle {
+  display: none;
+}
+@keyframes shake {
+  0%, 100% { transform: rotate(var(--rot, 0deg)) translateX(0); }
+  15% { transform: rotate(var(--rot, 0deg)) translateX(-5px); }
+  30% { transform: rotate(var(--rot, 0deg)) translateX(5px); }
+  45% { transform: rotate(var(--rot, 0deg)) translateX(-4px); }
+  60% { transform: rotate(var(--rot, 0deg)) translateX(4px); }
+  75% { transform: rotate(var(--rot, 0deg)) translateX(-2px); }
+  90% { transform: rotate(var(--rot, 0deg)) translateX(2px); }
+}
+
+.card-wrapper.shaking {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ─── Card Face (shared) ───────────────────────────────── */
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  overflow: hidden;
+}
+
+/* ─── Card Front ───────────────────────────────────────── */
+.card-front {
+  background: var(--card);
+  border: 1.5px solid rgba(201,169,110,0.3);
+  box-shadow: 0 2px 8px rgba(74,55,40,0.08), 0 1px 2px rgba(74,55,40,0.06);
+}
+
+.card-front .flourish {
+  position: absolute;
+  font-size: 0.7rem;
+  color: var(--gold);
+  opacity: 0.5;
+  line-height: 1;
+}
+.card-front .flourish.tl { top: 6px; left: 8px; }
+.card-front .flourish.tr { top: 6px; right: 8px; transform: scaleX(-1); }
+.card-front .flourish.bl { bottom: 6px; left: 8px; transform: scaleY(-1); }
+.card-front .flourish.br { bottom: 6px; right: 8px; transform: scale(-1); }
+
+.card-front .day-label {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--brown);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.card-front .lock-icon {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  opacity: 0.5;
+}
+
+/* ─── Card Back ────────────────────────────────────────── */
+.card-back {
+  background: var(--card-back);
+  border: 1.5px solid rgba(226,160,160,0.3);
+  transform: rotateY(180deg);
+  box-shadow: 0 2px 8px rgba(74,55,40,0.08);
+  text-align: center;
+  padding: 1rem 0.6rem;
+}
+
+.card-back .message {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 0.52rem;
+  line-height: 1.5;
+  color: var(--brown);
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.card-back .doodle {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-size: 0.75rem;
+  opacity: 0.4;
+}
+
+/* ─── Intro Card (Day 1) ───────────────────────────────── */
+.card-wrapper[data-day="1"] .card-front {
+  border: 2px dashed var(--blush);
+  background: linear-gradient(135deg, #FFF8F0, #FFF0E8);
+}
+
+/* ─── Finale Card (Day 10) ─────────────────────────────── */
+.card-wrapper[data-day="10"] .card-front {
+  border: 2px solid var(--gold);
+}
+.card-wrapper[data-day="10"].unlocked .card-front {
+  animation: goldPulse 2s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(201,169,110,0.2), 0 2px 8px rgba(74,55,40,0.08); }
+  50% { box-shadow: 0 0 18px rgba(201,169,110,0.45), 0 2px 8px rgba(74,55,40,0.08); }
+}
+
+.card-wrapper[data-day="10"] .card-back .message {
+  font-family: var(--serif);
+  font-style: normal;
+  font-size: 0.52rem;
+  font-weight: 600;
+}
+
+/* ─── Tooltip ──────────────────────────────────────────── */
+.tooltip {
+  position: absolute;
+  background: var(--brown);
+  color: var(--bg);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 20;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip.visible { opacity: 1; }
+
+/* ─── Footer ───────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 1rem 1rem 2rem;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--brown);
+  opacity: 0.35;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Confetti Canvas ──────────────────────────────────── */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ─── Desktop ──────────────────────────────────────────── */
+@media (min-width: 600px) {
+  .card-grid {
+    max-width: 560px;
+    gap: 1.25rem;
+  }
+  .card-wrapper {
+    width: calc(25% - 1rem);
+  }
+  .header h1 { font-size: 2.5rem; }
+  .card-front .day-label { font-size: 1.15rem; }
+  .card-back .message { font-size: 0.82rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG noise filter for paper grain texture -->
+<svg class="noise-filter">
+  <filter id="paperNoise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+    <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply"/>
+  </filter>
+</svg>
+
+<!-- Header -->
+<header class="header">
+  <h1>10 days of you <span class="pulse-emoji">💌</span></h1>
+  <p class="subtitle">one reason, every day, until your birthday</p>
+</header>
+
+<!-- Card Grid (populated by JS) -->
+<div class="card-grid" id="cardGrid"></div>
+
+<!-- Footer -->
+<footer class="footer" id="footer"></footer>
+
+<!-- Confetti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CONFIGURATION — Edit these three things!
+   ═══════════════════════════════════════════════════════════ */
+
+// 1. Start date — Day 1 falls on this date. Format: "YYYY-MM-DD"
+const START_DATE = "2026-05-27";
+
+// 2. Recipient name for the footer
+const RECIPIENT_NAME = "[name]";
+
+/* ──────────────────────────────────────────────────────────
+   YOUR MESSAGES HERE
+   Edit each string below. There are 10 total:
+   - Card 1  = Intro / teaser card
+   - Cards 2–9 = Your reasons, memories, inside jokes
+   - Card 10 = The grand finale birthday message
+   ────────────────────────────────────────────────────────── */
+const CARD_MESSAGES = [
+  // Card 1 — Intro
+  "Something special is on its way… 💌\nCome back tomorrow for the first of many little reasons why you matter so much.",
+
+  // Card 2
+  "Because you always know when I need a hug — even through a screen 🤗",
+
+  // Card 3
+  "Because your laugh is the kind that fills up an entire room and makes everyone else start laughing too 😂",
+
+  // Card 4
+  "Because you remember the tiny things nobody else notices, and that makes people feel so seen 🌻",
+
+  // Card 5
+  "Because you never gave up on that thing — you know the one — and I'm still so proud of you 💪",
+
+  // Card 6
+  "Because every playlist you make is somehow exactly the mood I didn't know I needed 🎧",
+
+  // Card 7
+  "Because you make even the most boring errands feel like a little adventure 🛒✨",
+
+  // Card 8
+  "Because you always share your fries, and that's basically the highest form of love 🍟❤️",
+
+  // Card 9
+  "Because talking to you at 2 AM when neither of us can sleep is my favourite kind of quiet 🌙",
+
+  // Card 10 — Grand Finale
+  "Happy Birthday!! 🎂✨\nYou are one of the most wonderful humans on this planet. Every single day I'm grateful you exist. Here's to another year of you being unapologetically, beautifully you. I love you 💛"
+];
+
+/* ═══════════════════════════════════════════════════════════
+   END OF CONFIGURATION — Code below runs everything
+   ═══════════════════════════════════════════════════════════ */
+
+// ─── Date Helpers ──────────────────────────────────────────
+function parseLocalDate(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function getToday() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function formatDate(date) {
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return months[date.getMonth()] + " " + date.getDate();
+}
+
+function getCardDate(dayIndex) {
+  const start = parseLocalDate(START_DATE);
+  const d = new Date(start);
+  d.setDate(d.getDate() + dayIndex);
+  return d;
+}
+
+// ─── localStorage ──────────────────────────────────────────
+const STORAGE_KEY = "10daysofyou_flipped";
+
+function getFlippedDays() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveFlippedDay(day) {
+  const flipped = getFlippedDays();
+  if (!flipped.includes(day)) {
+    flipped.push(day);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(flipped));
+  }
+}
+
+// ─── Card Decorations ─────────────────────────────────────
+const DOODLES = ["♡", "✦", "✿", "❋", "♡", "✧", "❀", "✦", "♡", "★"];
+
+// ─── Build Cards ──────────────────────────────────────────
+const grid = document.getElementById("cardGrid");
+const today = getToday();
+const flippedDays = getFlippedDays();
+
+// Pre-generate persistent random rotations
+const rotations = [];
+for (let i = 0; i < 10; i++) {
+  // Seeded-ish: consistent per card index
+  rotations.push(((Math.sin(i * 9.1 + 3.7) + 1) / 2) * 12 - 6);
+}
+
+let hasUnflippedAvailable = false;
+
+for (let i = 0; i < 10; i++) {
+  const day = i + 1;
+  const cardDate = getCardDate(i);
+  const isUnlocked = today >= cardDate;
+  const wasFlipped = isUnlocked && flippedDays.includes(day);
+
+  if (isUnlocked && !wasFlipped) hasUnflippedAvailable = true;
+
+  // Determine front label
+  let frontLabel;
+  if (day === 1) frontLabel = "✉ Hello";
+  else if (day === 10) frontLabel = "★ Day 10 ★";
+  else frontLabel = "Day " + day;
+
+  // Build wrapper
+  const wrapper = document.createElement("div");
+  wrapper.className = "card-wrapper " + (isUnlocked ? "unlocked" : "locked");
+  if (wasFlipped) wrapper.classList.add("flipped-state");
+  wrapper.dataset.day = day;
+  wrapper.style.setProperty("--rot", rotations[i].toFixed(2) + "deg");
+  wrapper.style.animationDelay = (i * 0.07) + "s";
+
+  // Card
+  const card = document.createElement("div");
+  card.className = "card" + (wasFlipped ? " flipped" : "");
+
+  // Front
+  const front = document.createElement("div");
+  front.className = "card-face card-front";
+  front.innerHTML =
+    '<span class="flourish tl">❧</span>' +
+    '<span class="flourish tr">❧</span>' +
+    '<span class="flourish bl">❧</span>' +
+    '<span class="flourish br">❧</span>' +
+    '<span class="day-label">' + frontLabel + '</span>' +
+    (!isUnlocked ? '<span class="lock-icon">🔒</span>' : '');
+
+  // Back
+  const back = document.createElement("div");
+  back.className = "card-face card-back";
+  const msgText = CARD_MESSAGES[i] || "Your message here";
+  back.innerHTML =
+    '<span class="message">' + msgText.replace(/\n/g, "<br>") + '</span>' +
+    '<span class="doodle">' + DOODLES[i] + '</span>';
+
+  card.appendChild(front);
+  card.appendChild(back);
+  wrapper.appendChild(card);
+
+  // Tooltip (for locked cards)
+  const tooltip = document.createElement("div");
+  tooltip.className = "tooltip";
+  tooltip.textContent = "come back " + formatDate(cardDate) + "… ✨";
+  wrapper.appendChild(tooltip);
+
+  // Click handler
+  wrapper.addEventListener("click", function() {
+    if (!isUnlocked) {
+      // Shake + tooltip
+      wrapper.classList.remove("shaking");
+      void wrapper.offsetWidth; // reflow
+      wrapper.classList.add("shaking");
+      tooltip.classList.add("visible");
+      setTimeout(() => tooltip.classList.remove("visible"), 1500);
+      setTimeout(() => wrapper.classList.remove("shaking"), 500);
+      return;
+    }
+    // Toggle flip
+    const isNowFlipped = card.classList.toggle("flipped");
+    wrapper.classList.toggle("flipped-state", isNowFlipped);
+    if (isNowFlipped) {
+      saveFlippedDay(day);
+      // Confetti for Day 10
+      if (day === 10) {
+        setTimeout(() => launchConfetti(), 350);
+      }
+    }
+  });
+
+  grid.appendChild(wrapper);
+}
+
+// ─── Footer ───────────────────────────────────────────────
+document.getElementById("footer").innerHTML = "made with ❤️ for " + RECIPIENT_NAME;
+
+// ─── Title Flash ──────────────────────────────────────────
+if (hasUnflippedAvailable) {
+  const originalTitle = document.title;
+  let showAlt = false;
+  setInterval(() => {
+    showAlt = !showAlt;
+    document.title = showAlt ? "💌 A new card awaits!" : originalTitle;
+  }, 2000);
+}
+
+// ─── Confetti Engine ──────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const COLORS = ["#E2A0A0", "#C9A96E", "#4A3728", "#FFF8F0", "#D4856A", "#E8C97A"];
+  const PIECE_COUNT = 120;
+  const pieces = [];
+
+  for (let i = 0; i < PIECE_COUNT; i++) {
+    pieces.push({
+      x: canvas.width * 0.5 + (Math.random() - 0.5) * canvas.width * 0.6,
+      y: canvas.height * 0.45 + (Math.random() - 0.5) * 60,
+      vx: (Math.random() - 0.5) * 8,
+      vy: -(Math.random() * 6 + 3),
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 6 + 3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 12,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+
+    for (const p of pieces) {
+      p.vy += 0.15; // gravity
+      p.vx *= 0.99; // air resistance
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.rotSpeed;
+
+      // Fade near bottom
+      if (p.y > canvas.height * 0.7) {
+        p.opacity -= 0.02;
+      }
+
+      if (p.opacity <= 0) continue;
+      alive = true;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+
+    frame++;
+    if (alive && frame < 300) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// Handle canvas resize
+window.addEventListener("resize", () => {
+  const canvas = document.getElementById("confetti-canvas");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
