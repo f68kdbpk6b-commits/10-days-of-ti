@@ -200,6 +200,21 @@ body::before {
 .card-wrapper.locked .card-back .doodle {
   display: none;
 }
+  .card-back .message-wrap {
+
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+}
 @keyframes shake {
   0%, 100% { transform: rotate(var(--rot, 0deg)) translateX(0); }
   15% { transform: rotate(var(--rot, 0deg)) translateX(-5px); }
@@ -555,7 +570,7 @@ for (let i = 0; i < 10; i++) {
   back.className = "card-face card-back";
   const msgText = CARD_MESSAGES[i] || "Your message here";
   back.innerHTML =
-    '<span class="message">' + msgText.replace(/\n/g, "<br>") + '</span>' +
+    '<div class="message-wrap"><span class="message">' + msgText.replace(/\n/g, "<br>") + '</span></div>' +
     '<span class="doodle">' + DOODLES[i] + '</span>';
 
   card.appendChild(front);
@@ -594,7 +609,21 @@ for (let i = 0; i < 10; i++) {
 
   grid.appendChild(wrapper);
 }
-
+// ─── Auto-scale messages to fit cards ─────────────────────
+setTimeout(() => {
+  document.querySelectorAll('.card-back').forEach(back => {
+    const wrap = back.querySelector('.message-wrap');
+    const msg = back.querySelector('.message');
+    if (!wrap || !msg) return;
+    let size = 8.5;
+    const minSize = 4.5;
+    msg.style.fontSize = size + 'px';
+    while (msg.scrollHeight > wrap.clientHeight && size > minSize) {
+      size -= 0.5;
+      msg.style.fontSize = size + 'px';
+    }
+  });
+}, 100);
 // ─── Footer ───────────────────────────────────────────────
 document.getElementById("footer").innerHTML = "made with ❤️ for " + RECIPIENT_NAME;
 
