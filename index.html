@@ -789,6 +789,10 @@ for (let i = 0; i < 10; i++) {
       if (day === 3) {
         setTimeout(() => launchSparkles(wrapper), 350);
       }
+  // Bark for Day 7
+      if (day === 7) {
+        setTimeout(() => playBark(), 350);
+      }
 // ─── Auto-scale messages to fit cards ─────────────────────
 setTimeout(() => {
   document.querySelectorAll('.card-back').forEach(back => {
@@ -959,6 +963,12 @@ function launchSparkles(cardEl) {
   }
 
   requestAnimationFrame(animate);
+}
+  // ─── Dog Bark Sound ───────────────────────────────────────
+function playBark() {
+  const bark = new Audio('https://www.myinstants.com/media/sounds/dog-barking-sound-effect.mp3');
+  bark.volume = 0.5;
+  bark.play().catch(() => {});
 }
 
 // Handle canvas resize
