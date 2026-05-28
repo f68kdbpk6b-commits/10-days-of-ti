@@ -597,56 +597,29 @@ open one each day, okay? no peeking.</div>
    CONFIGURATION — Edit these three things!
    ═══════════════════════════════════════════════════════════ */
 
-// 1. Start date — Day 1 falls on this date. Format: "YYYY-MM-DD"
 const START_DATE = "2026-05-27";
-
-// 2. Recipient name for the footer
 const RECIPIENT_NAME = "Ti iu";
 
 /* ──────────────────────────────────────────────────────────
    YOUR MESSAGES HERE
-   Edit each string below. There are 10 total:
-   - Card 1  = Intro / teaser card
-   - Cards 2–9 = Your reasons, memories, inside jokes
-   - Card 10 = The grand finale birthday message
    ────────────────────────────────────────────────────────── */
 const CARD_MESSAGES = [
-  // Card 1 — Intro
   "Hi baby, consider this a small pre-birthday gift 💌\nCome back tomorrow for silly little notes.",
-
-  // Card 2
   "because you always know when i need a hug or a kiss, even through a screen",
-
-  // Card 3
   "thank you for taking care of me in tiny ways \nit means more than i can even say",
-
-  // Card 4
   "damn, i can't get over the light in your eyes when you sing",
-
-  // Card 5
   "you are much more important in this world than you realize",
-
-  // Card 6
   "i wish you can see yourself in my way, how AMAZZZING you are",
-
-  // Card 7
   "chó ti, em thèm đồ hàn",
-
-  // Card 8
   "i think my favorite place in the world is right beside you",
-
-  // Card 9
   "i would love to wake up one day next to you, enjoy our breakfast together, just simple little moments",
-
-  // Card 10 — Grand Finale
   "Happy Birthday big nugget!! 🎂✨\nYou are one of the most wonderful humans on this planet. Every single day I'm grateful you exist. Here's to another year of you being unapologetically, beautifully you. I love you 💕"
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   END OF CONFIGURATION — Code below runs everything
+   END OF CONFIGURATION
    ═══════════════════════════════════════════════════════════ */
 
-// ─── Date Helpers ──────────────────────────────────────────
 function parseLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
   return new Date(y, m - 1, d);
@@ -669,7 +642,6 @@ function getCardDate(dayIndex) {
   return d;
 }
 
-// ─── localStorage ──────────────────────────────────────────
 const STORAGE_KEY = "10daysofyou_flipped";
 
 function getFlippedDays() {
@@ -687,18 +659,14 @@ function saveFlippedDay(day) {
   }
 }
 
-// ─── Card Decorations ─────────────────────────────────────
 const DOODLES = ["♡", "✦", "✿", "❋", "♡", "✧", "❀", "✦", "♡", "★"];
 
-// ─── Build Cards ──────────────────────────────────────────
 const grid = document.getElementById("cardGrid");
 const today = getToday();
 const flippedDays = getFlippedDays();
 
-// Pre-generate persistent random rotations
 const rotations = [];
 for (let i = 0; i < 10; i++) {
-  // Seeded-ish: consistent per card index
   rotations.push(((Math.sin(i * 9.1 + 3.7) + 1) / 2) * 12 - 6);
 }
 
@@ -712,13 +680,11 @@ for (let i = 0; i < 10; i++) {
 
   if (isUnlocked && !wasFlipped) hasUnflippedAvailable = true;
 
-  // Determine front label
   let frontLabel;
   if (day === 1) frontLabel = "✉ Hello";
   else if (day === 10) frontLabel = "Happy Birthday 🎂";
   else frontLabel = "Day " + day;
 
-  // Build wrapper
   const wrapper = document.createElement("div");
   wrapper.className = "card-wrapper " + (isUnlocked ? "unlocked" : "locked");
   if (wasFlipped) wrapper.classList.add("flipped-state");
@@ -726,11 +692,9 @@ for (let i = 0; i < 10; i++) {
   wrapper.style.setProperty("--rot", rotations[i].toFixed(2) + "deg");
   wrapper.style.animationDelay = (i * 0.07) + "s";
 
-  // Card
   const card = document.createElement("div");
   card.className = "card" + (wasFlipped ? " flipped" : "");
 
-  // Front
   const front = document.createElement("div");
   front.className = "card-face card-front";
   front.innerHTML =
@@ -741,7 +705,6 @@ for (let i = 0; i < 10; i++) {
     '<span class="day-label">' + frontLabel + '</span>' +
     (!isUnlocked ? '<span class="lock-icon">🔒</span>' : '');
 
-  // Back
   const back = document.createElement("div");
   back.className = "card-face card-back";
   const msgText = CARD_MESSAGES[i] || "Your message here";
@@ -753,30 +716,31 @@ for (let i = 0; i < 10; i++) {
   card.appendChild(back);
   wrapper.appendChild(card);
 
-  // Tooltip (for locked cards)
   const tooltip = document.createElement("div");
   tooltip.className = "tooltip";
   tooltip.textContent = "come back " + formatDate(cardDate) + "… ✨";
   wrapper.appendChild(tooltip);
 
-  // Click handler
   wrapper.addEventListener("click", function() {
     if (!isUnlocked) {
-      // Shake + tooltip
       wrapper.classList.remove("shaking");
-      void wrapper.offsetWidth; // reflow
+      void wrapper.offsetWidth;
       wrapper.classList.add("shaking");
       tooltip.classList.add("visible");
       setTimeout(() => tooltip.classList.remove("visible"), 1500);
       setTimeout(() => wrapper.classList.remove("shaking"), 500);
       return;
     }
-    // Toggle flip
     const isNowFlipped = card.classList.toggle("flipped");
     wrapper.classList.toggle("flipped-state", isNowFlipped);
     if (isNowFlipped) {
       saveFlippedDay(day);
-      // Confetti for Day 10
+      if (day === 3) {
+        setTimeout(() => launchSparkles(wrapper), 350);
+      }
+      if (day === 7) {
+        setTimeout(() => playBark(), 350);
+      }
       if (day === 10) {
         setTimeout(() => launchConfetti(), 350);
       }
@@ -785,14 +749,7 @@ for (let i = 0; i < 10; i++) {
 
   grid.appendChild(wrapper);
 }
-  // Sparkles for Day 3
-      if (day === 3) {
-        setTimeout(() => launchSparkles(wrapper), 350);
-      }
-  // Bark for Day 7
-      if (day === 7) {
-        setTimeout(() => playBark(), 350);
-      }
+
 // ─── Auto-scale messages to fit cards ─────────────────────
 setTimeout(() => {
   document.querySelectorAll('.card-back').forEach(back => {
@@ -808,7 +765,8 @@ setTimeout(() => {
     }
   });
 }, 100);
- // ─── Landing Page → Cards Transition ──────────────────────
+
+// ─── Landing Page → Cards Transition ──────────────────────
 document.getElementById("enterBtn").addEventListener("click", function() {
   const landing = document.getElementById("landing");
   const cards = document.getElementById("cardsSection");
@@ -819,6 +777,7 @@ document.getElementById("enterBtn").addEventListener("click", function() {
     window.scrollTo(0, 0);
   }, 500);
 });
+
 // ─── Footer ───────────────────────────────────────────────
 document.getElementById("footer").innerHTML = "made with ❤️ for " + RECIPIENT_NAME;
 
@@ -840,10 +799,9 @@ function launchConfetti() {
   canvas.height = window.innerHeight;
 
   const COLORS = ["#E2A0A0", "#C9A96E", "#4A3728", "#FFF8F0", "#D4856A", "#E8C97A"];
-  const PIECE_COUNT = 120;
   const pieces = [];
 
-  for (let i = 0; i < PIECE_COUNT; i++) {
+  for (let i = 0; i < 120; i++) {
     pieces.push({
       x: canvas.width * 0.5 + (Math.random() - 0.5) * canvas.width * 0.6,
       y: canvas.height * 0.45 + (Math.random() - 0.5) * 60,
@@ -857,6 +815,35 @@ function launchConfetti() {
       opacity: 1
     });
   }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    for (const p of pieces) {
+      p.vy += 0.15;
+      p.vx *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.rotSpeed;
+      if (p.y > canvas.height * 0.7) p.opacity -= 0.02;
+      if (p.opacity <= 0) continue;
+      alive = true;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    frame++;
+    if (alive && frame < 300) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  requestAnimationFrame(animate);
+}
+
 // ─── Sparkle Burst Engine ─────────────────────────────────
 function launchSparkles(cardEl) {
   const rect = cardEl.getBoundingClientRect();
@@ -888,7 +875,6 @@ function launchSparkles(cardEl) {
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let alive = false;
-
     for (const s of sparks) {
       s.x += s.vx;
       s.y += s.vy;
@@ -896,12 +882,10 @@ function launchSparkles(cardEl) {
       s.opacity -= s.decay;
       if (s.opacity <= 0) continue;
       alive = true;
-
       ctx.save();
       ctx.globalAlpha = s.opacity;
       ctx.fillStyle = s.color;
       ctx.beginPath();
-      // Draw a 4-point star
       const sz = s.size;
       ctx.moveTo(s.x, s.y - sz);
       ctx.lineTo(s.x + sz * 0.3, s.y - sz * 0.3);
@@ -915,58 +899,16 @@ function launchSparkles(cardEl) {
       ctx.fill();
       ctx.restore();
     }
-
     frame++;
-    if (alive && frame < 200) {
-      requestAnimationFrame(animate);
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    if (alive && frame < 200) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   requestAnimationFrame(animate);
 }
-  let frame = 0;
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let alive = false;
 
-    for (const p of pieces) {
-      p.vy += 0.15; // gravity
-      p.vx *= 0.99; // air resistance
-      p.x += p.vx;
-      p.y += p.vy;
-      p.rotation += p.rotSpeed;
-
-      // Fade near bottom
-      if (p.y > canvas.height * 0.7) {
-        p.opacity -= 0.02;
-      }
-
-      if (p.opacity <= 0) continue;
-      alive = true;
-
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate((p.rotation * Math.PI) / 180);
-      ctx.globalAlpha = Math.max(0, p.opacity);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
-    }
-
-    frame++;
-    if (alive && frame < 300) {
-      requestAnimationFrame(animate);
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-  // ─── Dog Bark Sound ───────────────────────────────────────
+// ─── Dog Bark Sound ───────────────────────────────────────
 function playBark() {
-  const bark = new Audio('https://www.myinstants.com/media/sounds/dog-barking-sound-effect.mp3');
+  const bark = new Audio('bark.mp3');
   bark.volume = 0.5;
   bark.play().catch(() => {});
 }
