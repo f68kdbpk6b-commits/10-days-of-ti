@@ -636,7 +636,7 @@ const CARD_MESSAGES = [
   "i think my favorite place in the world is right beside you",
 
   // Card 9
-  "thank you for being my safe space",
+  "i would love to wake up one day next to you, enjoy our breakfast together, just simple little moments",
 
   // Card 10 — Grand Finale
   "Happy Birthday big nugget!! 🎂✨\nYou are one of the most wonderful humans on this planet. Every single day I'm grateful you exist. Here's to another year of you being unapologetically, beautifully you. I love you 💕"
@@ -785,6 +785,10 @@ for (let i = 0; i < 10; i++) {
 
   grid.appendChild(wrapper);
 }
+  // Sparkles for Day 3
+      if (day === 3) {
+        setTimeout(() => launchSparkles(wrapper), 350);
+      }
 // ─── Auto-scale messages to fit cards ─────────────────────
 setTimeout(() => {
   document.querySelectorAll('.card-back').forEach(back => {
@@ -849,7 +853,74 @@ function launchConfetti() {
       opacity: 1
     });
   }
+// ─── Sparkle Burst Engine ─────────────────────────────────
+function launchSparkles(cardEl) {
+  const rect = cardEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
+  const COLORS = ["#FFD700", "#FFF8DC", "#FFFACD", "#F5E1D0", "#FFE4B5"];
+  const sparks = [];
+
+  for (let i = 0; i < 40; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 3 + 1.5;
+    sparks.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: Math.random() * 3 + 1.5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      opacity: 1,
+      decay: Math.random() * 0.02 + 0.015
+    });
+  }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+
+    for (const s of sparks) {
+      s.x += s.vx;
+      s.y += s.vy;
+      s.vy += 0.03;
+      s.opacity -= s.decay;
+      if (s.opacity <= 0) continue;
+      alive = true;
+
+      ctx.save();
+      ctx.globalAlpha = s.opacity;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      // Draw a 4-point star
+      const sz = s.size;
+      ctx.moveTo(s.x, s.y - sz);
+      ctx.lineTo(s.x + sz * 0.3, s.y - sz * 0.3);
+      ctx.lineTo(s.x + sz, s.y);
+      ctx.lineTo(s.x + sz * 0.3, s.y + sz * 0.3);
+      ctx.lineTo(s.x, s.y + sz);
+      ctx.lineTo(s.x - sz * 0.3, s.y + sz * 0.3);
+      ctx.lineTo(s.x - sz, s.y);
+      ctx.lineTo(s.x - sz * 0.3, s.y - sz * 0.3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    frame++;
+    if (alive && frame < 200) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  requestAnimationFrame(animate);
+}
   let frame = 0;
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
