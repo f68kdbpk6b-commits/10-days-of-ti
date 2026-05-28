@@ -528,6 +528,25 @@ body::before {
   inset: 0;
   background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px);
 }
+  /* ─── Day 10 Grand Reveal ──────────────────────────────── */
+.card-grid.finale-mode .card-wrapper:not([data-day="10"]) {
+  animation: fadeAway 0.6s ease forwards;
+}
+@keyframes fadeAway {
+  to { opacity: 0; transform: scale(0.8); pointer-events: none; }
+}
+
+.card-wrapper.finale-expand {
+  animation: expandCard 0.8s 0.5s ease forwards !important;
+  z-index: 50 !important;
+}
+@keyframes expandCard {
+  to {
+    width: 75%;
+    aspect-ratio: 3 / 4;
+    transform: rotate(0deg) !important;
+  }
+}
 /* ─── Desktop ──────────────────────────────────────────── */
 @media (min-width: 600px) {
   .card-grid {
@@ -610,10 +629,10 @@ const CARD_MESSAGES = [
   "damn, i can't get over the light in your eyes when you sing",
   "you are much more important in this world than you realize",
   "i wish you can see yourself in my way, how AMAZZZING you are",
-  "chó ti, em thèm đồ hàn",
+  "i hope ill be the one you come home to right at the end of every day",
   "i think my favorite place in the world is right beside you",
   "i would love to wake up one day next to you, enjoy our breakfast together, just simple little moments",
-  "Happy Birthday big nugget!! 🎂✨\nYou are one of the most wonderful humans on this planet. Every single day I'm grateful you exist. Here's to another year of you being unapologetically, beautifully you. I love you 💕"
+  "Happy Birthday big nugget!! 🎂✨\nYou are one of the most wonderful humans on this planet. Every single day, I'm grateful you exist. Here's to another year of you being unapologetically, beautifully you. I love you 💕"
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -738,11 +757,15 @@ for (let i = 0; i < 10; i++) {
       if (day === 3) {
         setTimeout(() => launchSparkles(wrapper), 350);
       }
-      if (day === 7) {
-        setTimeout(() => playBark(), 350);
-      }
-      if (day === 10) {
-        setTimeout(() => launchConfetti(), 350);
+    
+    if (day === 10) {
+        // Other cards fade away
+        grid.classList.add("finale-mode");
+        // This card expands
+        setTimeout(() => {
+          wrapper.classList.add("finale-expand");
+          launchConfetti();
+        }, 350);
       }
     }
   });
@@ -904,13 +927,6 @@ function launchSparkles(cardEl) {
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   requestAnimationFrame(animate);
-}
-
-// ─── Dog Bark Sound ───────────────────────────────────────
-function playBark() {
-  const bark = new Audio('bark.mp3');
-  bark.volume = 0.5;
-  bark.play().catch(() => {});
 }
 
 // Handle canvas resize
